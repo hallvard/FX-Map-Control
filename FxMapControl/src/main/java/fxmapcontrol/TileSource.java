@@ -5,7 +5,6 @@
 package fxmapcontrol;
 
 import java.util.Locale;
-
 import javafx.scene.image.Image;
 
 /**
@@ -64,16 +63,19 @@ public class TileSource {
         this.urlFormat = urlFormat;
     }
 
-    public String getUrl(int x, int y, int zoomLevel) {
+    protected String getUrl(int x, int y, int zoomLevel) {
         return urlFormatter != null
                 ? urlFormatter.getUrl(x, y, zoomLevel)
                 : null;
     }
 
-    public Image getImage(int x, int y, int zoomLevel, boolean backgroundLoading) {
-        String url = getUrl(x, y, zoomLevel);
-
-        return url != null ? new Image(url, backgroundLoading) : null;
+    public String getUrl(TileCoords tileCoords) {
+        return getUrl(tileCoords.xIndex(), tileCoords.y(), tileCoords.zoomLevel());
+    }
+      
+    public Image getImage(TileCoords tileCoords, boolean backgroundLoading) {
+      String url = getUrl(tileCoords);  
+      return url != null ? new Image(url, backgroundLoading) : null;
     }
 
     private String getDefaultUrl(int x, int y, int zoomLevel) {

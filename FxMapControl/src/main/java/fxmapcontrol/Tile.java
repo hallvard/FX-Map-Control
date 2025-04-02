@@ -13,37 +13,36 @@ import javafx.util.Duration;
  * Provides the ImageView that displays a map tile image.
  */
 public class Tile {
-    private final int zoomLevel;
-    private final int x;
-    private final int y;
+
+    private final TileCoords coords;
     private final ImageView imageView;
     private boolean pending;
 
     public Tile(int zoomLevel, int x, int y) {
-        this.zoomLevel = zoomLevel;
-        this.x = x;
-        this.y = y;
-
+        this.coords = new TileCoords(x, y, zoomLevel);
         imageView = new ImageView();
         imageView.setOpacity(0d);
         pending = true;
     }
 
+    public final TileCoords getCoords() {
+        return coords;
+    }
+
     public final int getZoomLevel() {
-        return zoomLevel;
+        return coords.zoomLevel();
     }
 
     public final int getX() {
-        return x;
+        return coords.x();
     }
 
     public final int getY() {
-        return y;
+        return coords.y();
     }
 
     public final int getXIndex() {
-        int numTiles = 1 << zoomLevel;
-        return ((x % numTiles) + numTiles) % numTiles;
+      return coords.xIndex();
     }
 
     public final boolean isPending() {

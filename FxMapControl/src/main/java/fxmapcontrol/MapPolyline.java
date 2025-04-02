@@ -7,7 +7,6 @@ package fxmapcontrol;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -88,7 +87,7 @@ public class MapPolyline extends Polyline implements IMapNode {
     }
 
     static List<Double> updatePoints(MapBase map, Location location, ObservableList<Location> locations) {
-        ArrayList<Double> points = null;
+        List<Double> points = null;
 
         if (map != null && locations != null && !locations.isEmpty()) {
             double longitudeOffset = 0d;
@@ -99,8 +98,8 @@ public class MapPolyline extends Polyline implements IMapNode {
                 if (viewportPosition.getX() < 0d || viewportPosition.getX() > map.getWidth()
                         || viewportPosition.getY() < 0d || viewportPosition.getY() > map.getHeight()) {
 
-                    double nearestLongitude = Location.nearestLongitude(location.getLongitude(), map.getCenter().getLongitude());
-                    longitudeOffset = nearestLongitude - location.getLongitude();
+                    double nearestLongitude = Location.nearestLongitude(location.longitude(), map.getCenter().longitude());
+                    longitudeOffset = nearestLongitude - location.longitude();
                 }
             }
 
@@ -108,7 +107,7 @@ public class MapPolyline extends Polyline implements IMapNode {
 
             for (Location loc : locations) {
                 Point2D p = map.locationToView(
-                        new Location(loc.getLatitude(), loc.getLongitude() + longitudeOffset));
+                        new Location(loc.latitude(), loc.longitude() + longitudeOffset));
 
                 if (Double.isInfinite(p.getX()) || Double.isInfinite(p.getY())) {
                     points = null;

@@ -9,22 +9,10 @@ package fxmapcontrol;
  */
 public interface ITileCache {
 
-    public static class CacheItem {
-        private final byte[] buffer;
-        private final long expiration; // milliseconds since 1970/01/01 00:00:00 UTC
-
-        public CacheItem(byte[] buffer, long expiration) {
-            this.buffer = buffer;
-            this.expiration = expiration;
-        }
-
-        public final byte[] getBuffer() {
-            return buffer;
-        }
-
-        public final long getExpiration() {
-            return expiration;
-        }
+    public record CacheItem(
+        byte[] buffer,
+        long expiration // milliseconds since 1970/01/01 00:00:00 UTC
+    ) {
     }
 
     CacheItem get(String key);

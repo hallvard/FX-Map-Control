@@ -3,40 +3,16 @@ package fxmapcontrol;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-
+import java.util.List;
 import javafx.geometry.Point2D;
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class WmtsCapabilities {
-
-    public final String layerIdentifier;
-    public final WmtsTileSource tileSource;
-    public final Collection<WmtsTileMatrixSet> tileMatrixSets;
-
-    private WmtsCapabilities(String layerIdentifier, WmtsTileSource tileSource, Collection<WmtsTileMatrixSet> tileMatrixSets) {
-        this.layerIdentifier = layerIdentifier;
-        this.tileSource = tileSource;
-        this.tileMatrixSets = tileMatrixSets;
-    }
-
-    public final String getLayerIdentifier() {
-        return layerIdentifier;
-    }
-
-    public final Collection<WmtsTileMatrixSet> getTileMatrixSets() {
-        return tileMatrixSets;
-    }
-
-    public final WmtsTileSource getTileSource() {
-        return tileSource;
-    }
+public record WmtsCapabilities(String layerIdentifier, WmtsTileSource tileSource, Collection<WmtsTileMatrixSet> tileMatrixSets) {
 
     public static WmtsCapabilities readCapabilities(String capabilitiesUrl, String layerIdentifier)
             throws ParserConfigurationException, SAXException, IOException {
@@ -104,7 +80,7 @@ public class WmtsCapabilities {
         }
 
         NodeList tileMatrixSetLinkNodes = layerElement.getElementsByTagName("TileMatrixSetLink");
-        ArrayList<String> tileMatrixSetIds = new ArrayList<>();
+        List<String> tileMatrixSetIds = new ArrayList<>();
 
         for (int i = 0; i < tileMatrixSetLinkNodes.getLength(); i++) {
             String tileMatrixSetId = getChildElementText((Element) tileMatrixSetLinkNodes.item(i), "TileMatrixSet");
@@ -146,7 +122,7 @@ public class WmtsCapabilities {
             throw new IllegalArgumentException("No TileMatrix elements found in TileMatrixSet \"" + identifier + "\".");
         }
 
-        Collection<WmtsTileMatrix> tileMatrixes = new ArrayList<>(tileMatrixNodes.getLength());
+        List<WmtsTileMatrix> tileMatrixes = new ArrayList<>(tileMatrixNodes.getLength());
         for (int i = 0; i < tileMatrixNodes.getLength(); i++) {
             tileMatrixes.add(readTileMatrix((Element) tileMatrixNodes.item(i)));
         }
@@ -165,7 +141,7 @@ public class WmtsCapabilities {
             throw new IllegalArgumentException("No ScaleDenominator element found in TileMatrix \"" + identifier + "\".");
         }
 
-        double scaleDenominator = Double.parseDouble(valueString);
+        double scaleDenominator = Double.valueOf(valueString);
 
         valueString = getChildElementText(tileMatrixElement, "TopLeftCorner");
         String[] topLeftValues;
@@ -175,36 +151,36 @@ public class WmtsCapabilities {
         }
 
         Point2D topLeft = new Point2D(
-                Double.parseDouble(topLeftValues[0]),
-                Double.parseDouble(topLeftValues[1]));
+                Double.valueOf(topLeftValues[0]),
+                Double.valueOf(topLeftValues[1]));
 
         valueString = getChildElementText(tileMatrixElement, "TileWidth");
         if (valueString == null || valueString.isEmpty()) {
             throw new IllegalArgumentException("No TileWidth element found in TileMatrix \"" + identifier + "\".");
         }
 
-        int tileWidth = Integer.parseInt(valueString);
+        int tileWidth = Integer.valueOf(valueString);
 
         valueString = getChildElementText(tileMatrixElement, "TileHeight");
         if (valueString == null || valueString.isEmpty()) {
             throw new IllegalArgumentException("No TileHeight element found in TileMatrix \"" + identifier + "\".");
         }
 
-        int tileHeight = Integer.parseInt(valueString);
+        int tileHeight = Integer.valueOf(valueString);
 
         valueString = getChildElementText(tileMatrixElement, "MatrixWidth");
         if (valueString == null || valueString.isEmpty()) {
             throw new IllegalArgumentException("No MatrixWidth element found in TileMatrix \"" + identifier + "\".");
         }
 
-        int matrixWidth = Integer.parseInt(valueString);
+        int matrixWidth = Integer.valueOf(valueString);
 
         valueString = getChildElementText(tileMatrixElement, "MatrixHeight");
         if (valueString == null || valueString.isEmpty()) {
             throw new IllegalArgumentException("No MatrixHeight element found in TileMatrix \"" + identifier + "\".");
         }
 
-        int matrixHeight = Integer.parseInt(valueString);
+        int matrixHeight = Integer.valueOf(valueString);
 
         return new WmtsTileMatrix(identifier, scaleDenominator, topLeft, tileWidth, tileHeight, matrixWidth, matrixHeight);
     }

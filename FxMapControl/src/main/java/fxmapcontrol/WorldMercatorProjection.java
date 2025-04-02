@@ -38,7 +38,7 @@ public class WorldMercatorProjection extends MapProjection {
 
     @Override
     public Point2D getRelativeScale(Location location) {
-        double lat = location.getLatitude() * Math.PI / 180d;
+        double lat = location.latitude() * Math.PI / 180d;
         double eSinLat = WGS84_ECCENTRICITY * Math.sin(lat);
         double k = Math.sqrt(1d - eSinLat * eSinLat) / Math.cos(lat); // p.44 (7-8)
 
@@ -48,8 +48,8 @@ public class WorldMercatorProjection extends MapProjection {
     @Override
     public Point2D locationToMap(Location location) {
         return new Point2D(
-                WGS84_METERS_PER_DEGREE * location.getLongitude(),
-                WGS84_METERS_PER_DEGREE * latitudeToY(location.getLatitude()));
+                WGS84_METERS_PER_DEGREE * location.longitude(),
+                WGS84_METERS_PER_DEGREE * latitudeToY(location.latitude()));
     }
 
     @Override

@@ -39,7 +39,7 @@ public class StereographicProjection extends AzimuthalProjection {
         double y = point.getY();
 
         if (x == 0d && y == 0d) {
-            return new Location(getCenter().getLatitude(), getCenter().getLongitude());
+            return new Location(getCenter().latitude(), getCenter().longitude());
         }
 
         double azimuth = Math.atan2(x, y);

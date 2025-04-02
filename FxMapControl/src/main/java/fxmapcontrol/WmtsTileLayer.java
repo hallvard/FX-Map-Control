@@ -7,10 +7,10 @@ package fxmapcontrol;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Service;
@@ -23,7 +23,7 @@ public class WmtsTileLayer extends MapTileLayerBase {
 
     private final StringProperty capabilitiesUrlProperty = new SimpleStringProperty(this, "capabilitiesUrl");
     private final StringProperty layerIdentiferProperty = new SimpleStringProperty(this, "layerIdentifer");
-    private final HashMap<String, WmtsTileMatrixSet> tileMatrixSets = new HashMap<>();
+    private final Map<String, WmtsTileMatrixSet> tileMatrixSets = new HashMap<>();
 
     public WmtsTileLayer(ITileImageLoader tileImageLoader) {
         super(tileImageLoader);
@@ -117,10 +117,10 @@ public class WmtsTileLayer extends MapTileLayerBase {
 
         // show all TileMatrix layers with Scale <= maxScale, at least the first layer
         //
-        List<WmtsTileMatrix> tileMatrixes = tileMatrixSet.getTileMatrixes();
+        List<WmtsTileMatrix> tileMatrixes = tileMatrixSet.tileMatrixes();
         List<WmtsTileMatrix> currentMatrixes = tileMatrixes.stream()
-                .filter(matrix -> matrix.getScale() <= maxScale)
-                .collect(Collectors.toList());
+                .filter(matrix -> matrix.scale() <= maxScale)
+                .toList();
 
         if (currentMatrixes.isEmpty() && !tileMatrixes.isEmpty()) {
             currentMatrixes.add(tileMatrixes.get(0));
@@ -129,12 +129,12 @@ public class WmtsTileLayer extends MapTileLayerBase {
         if (this != map.getChildrenUnmodifiable().stream().findFirst().orElse(null)) { // no background tiles
             currentMatrixes = currentMatrixes.stream()
                     .skip(currentMatrixes.size() - 1)
-                    .collect(Collectors.toList()); // last element only
+                    .toList(); // last element only
 
         } else if (currentMatrixes.size() > getMaxBackgroundLevels() + 1) {
             currentMatrixes = currentMatrixes.stream()
                     .skip(currentMatrixes.size() - getMaxBackgroundLevels() - 1)
-                    .collect(Collectors.toList());
+                    .toList();
         }
 
         List<WmtsTileMatrix> layerMatrixes = currentMatrixes; // final...
@@ -142,7 +142,7 @@ public class WmtsTileLayer extends MapTileLayerBase {
         List<WmtsTileMatrixLayer> currentLayers = getChildren().stream()
                 .map(node -> (WmtsTileMatrixLayer) node)
                 .filter(layer -> layerMatrixes.contains(layer.getTileMatrix()))
-                .collect(Collectors.toList());
+                .toList();
 
         getChildren().clear();
 
@@ -152,7 +152,7 @@ public class WmtsTileLayer extends MapTileLayerBase {
                     .findFirst().orElse(null);
 
             if (layer == null) {
-                layer = new WmtsTileMatrixLayer(tileMatrix, tileMatrixSet.getTileMatrixes().indexOf(tileMatrix));
+                layer = new WmtsTileMatrixLayer(tileMatrix, tileMatrixSet.tileMatrixes().indexOf(tileMatrix));
                 layersChanged = true;
             }
 
@@ -167,7 +167,7 @@ public class WmtsTileLayer extends MapTileLayerBase {
     }
 
     private void updateTiles(WmtsTileMatrixSet tileMatrixSet) {
-        ArrayList<Tile> tiles = new ArrayList<>();
+        List<Tile> tiles = new ArrayList<>();
 
         getChildren().stream()
                 .map(node -> (WmtsTileMatrixLayer) node)
@@ -180,7 +180,7 @@ public class WmtsTileLayer extends MapTileLayerBase {
             tileSource.setTileMatrixSet(tileMatrixSet);
 
             if (sourceName != null && !sourceName.isEmpty()) {
-                sourceName += "/" + tileMatrixSet.getIdentifier();
+                sourceName += "/" + tileMatrixSet.identifier();
             }
         }
 
@@ -193,11 +193,11 @@ public class WmtsTileLayer extends MapTileLayerBase {
         protected void succeeded() {
             WmtsCapabilities capabilities = getValue();
             if (capabilities != null) {
-                setTileSource(capabilities.getTileSource());
-                setLayerIdentifier(capabilities.getLayerIdentifier());
+                setTileSource(capabilities.tileSource());
+                setLayerIdentifier(capabilities.layerIdentifier());
 
-                tileMatrixSets.putAll(capabilities.getTileMatrixSets().stream()
-                        .collect(Collectors.toMap(s -> s.getSupportedCrs(), s -> s)));
+                tileMatrixSets.putAll(capabilities.tileMatrixSets().stream()
+                        .collect(Collectors.toMap(s -> s.supportedCrs(), s -> s)));
 
                 updateTileLayer();
             }

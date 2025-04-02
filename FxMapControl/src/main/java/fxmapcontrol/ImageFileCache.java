@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  * Default ITileCache implementation. Caches tile image files in a directory given by the rootDirectory
  * property.
  */
-public class ImageFileCache implements ITileCache {
+public record ImageFileCache(Path rootDirectory) implements ITileCache {
 
     // For compatibility with XAML Map Control ImageFileCache, expiration dates are stored as .NET DateTime ticks,
     // i.e. 100-nanosecond intervals since 0001/01/01 00:00:00 UTC. The datetimeOffset and datetimeFactor constants
@@ -29,13 +29,6 @@ public class ImageFileCache implements ITileCache {
     private static final long datetimeOffset = 62135596800000L;
     private static final long datetimeFactor = 10000L;
     private static final ByteBuffer expirationMarker = ByteBuffer.wrap("EXPIRES:".getBytes(StandardCharsets.US_ASCII));
-
-    private final Path rootDirectory;
-
-    public ImageFileCache(Path rootDirectory) {
-        this.rootDirectory = rootDirectory;
-        //System.out.println(rootDirectory.toAbsolutePath());
-    }
 
     public ImageFileCache() {
         this(getDefaultRootDirectory());
@@ -56,10 +49,6 @@ public class ImageFileCache implements ITileCache {
         }
 
         return null;
-    }
-
-    public final Path getRootDirectory() {
-        return rootDirectory;
     }
 
     @Override

@@ -5,7 +5,6 @@
 package fxmapcontrol;
 
 import java.util.Locale;
-
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
@@ -99,7 +98,7 @@ public abstract class MapProjection {
         Location sw = mapToLocation(new Point2D(bounds.getMinX(), bounds.getMinY()));
         Location ne = mapToLocation(new Point2D(bounds.getMaxX(), bounds.getMaxY()));
 
-        return new MapBoundingBox(sw.getLatitude(), sw.getLongitude(), ne.getLatitude(), ne.getLongitude());
+        return new MapBoundingBox(sw.latitude(), sw.longitude(), ne.latitude(), ne.longitude());
     }
 
     /**
@@ -114,7 +113,7 @@ public abstract class MapProjection {
      */
     public String getCrsValue() {
         return crsId.startsWith("AUTO:") || crsId.startsWith("AUTO2:")
-                ? String.format(Locale.ROOT, "%s,1,%f,%f", crsId, center.getLongitude(), center.getLatitude())
+                ? String.format(Locale.ROOT, "%s,1,%f,%f", crsId, center.longitude(), center.latitude())
                 : crsId;
     }
 

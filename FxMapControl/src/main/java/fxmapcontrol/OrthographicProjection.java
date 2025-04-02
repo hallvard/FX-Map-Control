@@ -25,9 +25,9 @@ public class OrthographicProjection extends AzimuthalProjection {
             return new Point2D(0d, 0d);
         }
 
-        double lat0 = getCenter().getLatitude() * Math.PI / 180d;
-        double lat = location.getLatitude() * Math.PI / 180d;
-        double dLon = (location.getLongitude() - getCenter().getLongitude()) * Math.PI / 180d;
+        double lat0 = getCenter().latitude() * Math.PI / 180d;
+        double lat = location.latitude() * Math.PI / 180d;
+        double dLon = (location.longitude() - getCenter().longitude()) * Math.PI / 180d;
 
         return new Point2D(
                 WGS84_EQUATORIAL_RADIUS * Math.cos(lat) * Math.sin(dLon),
@@ -40,7 +40,7 @@ public class OrthographicProjection extends AzimuthalProjection {
         double y = point.getY();
 
         if (x == 0d && y == 0d) {
-            return new Location(getCenter().getLatitude(), getCenter().getLongitude());
+            return new Location(getCenter().latitude(), getCenter().longitude());
         }
 
         x /= WGS84_EQUATORIAL_RADIUS;
@@ -55,12 +55,12 @@ public class OrthographicProjection extends AzimuthalProjection {
         double sinC = r;
         double cosC = Math.sqrt(1 - r2);
 
-        double lat0 = getCenter().getLatitude() * Math.PI / 180d;
+        double lat0 = getCenter().latitude() * Math.PI / 180d;
         double cosLat0 = Math.cos(lat0);
         double sinLat0 = Math.sin(lat0);
 
         return new Location(
                 180d / Math.PI * Math.asin(cosC * sinLat0 + y * sinC * cosLat0 / r),
-                180d / Math.PI * Math.atan2(x * sinC, r * cosC * cosLat0 - y * sinC * sinLat0) + getCenter().getLongitude());
+                180d / Math.PI * Math.atan2(x * sinC, r * cosC * cosLat0 - y * sinC * sinLat0) + getCenter().longitude());
     }
 }

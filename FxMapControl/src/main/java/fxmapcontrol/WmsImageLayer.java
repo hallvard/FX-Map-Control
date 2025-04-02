@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -16,9 +15,7 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.geometry.Bounds;
 import javafx.scene.image.Image;
-
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -36,7 +33,7 @@ public class WmsImageLayer extends MapImageLayer {
     private final StringProperty formatProperty = new SimpleStringProperty(this, "format", "image/png");
 
     public WmsImageLayer() {
-        ChangeListener changeListener = (observable, oldValue, newValue) -> updateImage();
+        ChangeListener<String> changeListener = (observable, oldValue, newValue) -> updateImage();
         serviceUrlProperty.addListener(changeListener);
         layersProperty.addListener(changeListener);
         stylesProperty.addListener(changeListener);

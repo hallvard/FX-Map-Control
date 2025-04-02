@@ -5,7 +5,6 @@
 package fxmapcontrol;
 
 import java.util.Locale;
-
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 
@@ -32,15 +31,15 @@ public class EquirectangularProjection extends MapProjection {
     @Override
     public Point2D getRelativeScale(Location location) {
         return new Point2D(
-                1d / Math.cos(location.getLatitude() * Math.PI / 180d),
+                1d / Math.cos(location.latitude() * Math.PI / 180d),
                 1d);
     }
 
     @Override
     public Point2D locationToMap(Location location) {
         return new Point2D(
-                WGS84_METERS_PER_DEGREE * location.getLongitude(),
-                WGS84_METERS_PER_DEGREE * location.getLatitude());
+                WGS84_METERS_PER_DEGREE * location.longitude(),
+                WGS84_METERS_PER_DEGREE * location.latitude());
     }
 
     @Override

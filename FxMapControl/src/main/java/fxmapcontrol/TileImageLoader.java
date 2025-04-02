@@ -5,7 +5,6 @@
 package fxmapcontrol;
 
 import fxmapcontrol.ITileCache.CacheItem;
-
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -17,13 +16,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.image.Image;
@@ -49,8 +48,8 @@ public class TileImageLoader implements ITileImageLoader {
         tileCache = cache;
     }
 
-    private final ConcurrentLinkedQueue<Tile> tileQueue = new ConcurrentLinkedQueue<>();
-    private final HashSet<LoadImageService> services = new HashSet<>();
+    private final Queue<Tile> tileQueue = new ConcurrentLinkedQueue<>();
+    private final Set<LoadImageService> services = new HashSet<>();
     private final int maxLoadTasks;
     private final int httpTimeout;
 
@@ -65,7 +64,7 @@ public class TileImageLoader implements ITileImageLoader {
 
     @Override
     public void loadTiles(Collection<Tile> tiles, TileSource tileSource, String tileSourceName) {
-        tiles = tiles.stream().filter(tile -> tile.isPending()).collect(Collectors.toList());
+        tiles = tiles.stream().filter(tile -> tile.isPending()).toList();
         tileQueue.clear();
 
         if (tileSource != null && !tiles.isEmpty()) {
@@ -130,7 +129,7 @@ public class TileImageLoader implements ITileImageLoader {
                     || tileSourceName.isEmpty()
                     || !tileSource.getUrlFormat().startsWith("http")) {
 
-                image = tileSource.getImage(tile.getXIndex(), tile.getY(), tile.getZoomLevel(), false);
+                image = tileSource.getImage(tile.getCoords(), false);
             } else {
                 image = loadCachedImage();
             }
@@ -142,7 +141,7 @@ public class TileImageLoader implements ITileImageLoader {
             Image image = null;
             String cacheKey = null;
             CacheItem cacheItem = null;
-            URL tileUrl = new URL(tileSource.getUrl(tile.getXIndex(), tile.getY(), tile.getZoomLevel()));
+            URL tileUrl = new URL(tileSource.getUrl(tile.getCoords()));
 
             try {
                 String fileName = Paths.get(tileUrl.getPath()).getFileName().toString();
@@ -156,7 +155,7 @@ public class TileImageLoader implements ITileImageLoader {
 
             if (cacheKey != null && (cacheItem = tileCache.get(cacheKey)) != null) {
                 try {
-                    try (ByteArrayInputStream memoryStream = new ByteArrayInputStream(cacheItem.getBuffer())) {
+                    try (ByteArrayInputStream memoryStream = new ByteArrayInputStream(cacheItem.buffer())) {
                         image = new Image(memoryStream);
                     }
                 } catch (Exception ex) {
@@ -166,7 +165,7 @@ public class TileImageLoader implements ITileImageLoader {
 
             if (image == null
                     || cacheItem == null
-                    || cacheItem.getExpiration() < new Date().getTime()) { // no cached image or cache expired
+                    || cacheItem.expiration() < new Date().getTime()) { // no cached image or cache expired
 
                 try {
                     HttpURLConnection connection = (HttpURLConnection) tileUrl.openConnection();
@@ -233,7 +232,7 @@ public class TileImageLoader implements ITileImageLoader {
 
             if (maxAge != null) {
                 try {
-                    expiration = Math.max(Integer.parseInt(maxAge.trim().substring(8)), 0);
+                    expiration = Math.max(Integer.valueOf(maxAge.trim().substring(8)), 0);
                 } catch (NumberFormatException ex) {
                 }
             }

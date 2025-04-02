@@ -21,13 +21,13 @@ public class WmtsTileSource extends TileSource {
     }
 
     @Override
-    public String getUrl(int x, int y, int zoomLevel) {
+    protected String getUrl(int x, int y, int zoomLevel) {
         String url = null;
 
-        if (tileMatrixSet != null && zoomLevel >= 0 && zoomLevel < tileMatrixSet.getTileMatrixes().size()) {
+        if (tileMatrixSet != null && zoomLevel >= 0 && zoomLevel < tileMatrixSet.tileMatrixes().size()) {
             url = getUrlFormat()
-                    .replace("{TileMatrixSet}", tileMatrixSet.getIdentifier())
-                    .replace("{TileMatrix}", tileMatrixSet.getTileMatrixes().get(zoomLevel).getIdentifier())
+                    .replace("{TileMatrixSet}", tileMatrixSet.identifier())
+                    .replace("{TileMatrix}", tileMatrixSet.tileMatrixes().get(zoomLevel).identifier())
                     .replace("{TileCol}", Integer.toString(x))
                     .replace("{TileRow}", Integer.toString(y));
         }

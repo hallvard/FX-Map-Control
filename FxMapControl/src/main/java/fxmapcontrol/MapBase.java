@@ -5,7 +5,6 @@
 package fxmapcontrol;
 
 import java.util.List;
-
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
@@ -455,11 +454,11 @@ public class MapBase extends Region implements IMapNode {
         if (value == null) {
             value = new Location(0d, 0d);
             property.setValue(value);
-        } else if (value.getLongitude() < -180d || value.getLongitude() > 180d
-                || value.getLatitude() < -maxLatitude || value.getLatitude() > maxLatitude) {
+        } else if (value.longitude() < -180d || value.longitude() > 180d
+                || value.latitude() < -maxLatitude || value.latitude() > maxLatitude) {
             value = new Location(
-                    Math.min(Math.max(value.getLatitude(), -maxLatitude), maxLatitude),
-                    Location.normalizeLongitude(value.getLongitude()));
+                    Math.min(Math.max(value.latitude(), -maxLatitude), maxLatitude),
+                    Location.normalizeLongitude(value.longitude()));
             property.setValue(value);
         }
         internalUpdate = false;
@@ -499,14 +498,14 @@ public class MapBase extends Region implements IMapNode {
         if (transformCenter != null) {
             center = viewToLocation(new Point2D(getWidth() / 2d, getHeight() / 2d));
 
-            double latitude = center.getLatitude();
+            double latitude = center.latitude();
 
             if (latitude < -projection.maxLatitude() || latitude > projection.maxLatitude()) {
                 latitude = Math.min(Math.max(latitude, -projection.maxLatitude()), projection.maxLatitude());
                 resetTransformCenter = true;
             }
 
-            center = new Location(latitude, Location.normalizeLongitude(center.getLongitude()));
+            center = new Location(latitude, Location.normalizeLongitude(center.longitude()));
 
             internalUpdate = true;
             setCenter(center);
@@ -526,9 +525,9 @@ public class MapBase extends Region implements IMapNode {
 
         viewScaleProperty.set(viewScale);
 
-        fireEvent(new ViewportChangedEvent(this, projectionChanged, getCenter().getLongitude() - centerLongitude));
+        fireEvent(new ViewportChangedEvent(this, projectionChanged, getCenter().longitude() - centerLongitude));
 
-        centerLongitude = getCenter().getLongitude();
+        centerLongitude = getCenter().longitude();
     }
 
     private abstract class TransitionBase<T> extends Transition {
@@ -559,14 +558,14 @@ public class MapBase extends Region implements IMapNode {
 
         public void start(Location from, Location to) {
             if (!from.equals(to)) {
-                double longitude = Location.normalizeLongitude(to.getLongitude());
-                if (longitude > from.getLongitude() + 180d) {
+                double longitude = Location.normalizeLongitude(to.longitude());
+                if (longitude > from.longitude() + 180d) {
                     longitude -= 360d;
-                } else if (longitude < from.getLongitude() - 180d) {
+                } else if (longitude < from.longitude() - 180d) {
                     longitude += 360d;
                 }
                 fromValue = from;
-                toValue = new Location(to.getLatitude(), longitude);
+                toValue = new Location(to.latitude(), longitude);
                 start();
             }
         }
@@ -574,8 +573,8 @@ public class MapBase extends Region implements IMapNode {
         @Override
         protected void interpolate(double f) {
             setCenter(new Location(
-                    (1d - f) * fromValue.getLatitude() + f * toValue.getLatitude(),
-                    (1d - f) * fromValue.getLongitude() + f * toValue.getLongitude()));
+                    (1d - f) * fromValue.latitude() + f * toValue.latitude(),
+                    (1d - f) * fromValue.longitude() + f * toValue.longitude()));
         }
     }
 

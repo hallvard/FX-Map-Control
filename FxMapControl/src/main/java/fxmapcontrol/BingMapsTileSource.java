@@ -14,7 +14,7 @@ class BingMapsTileSource extends TileSource {
     }
 
     @Override
-    public String getUrl(int x, int y, int zoomLevel) {
+    protected String getUrl(int x, int y, int zoomLevel) {
         if (zoomLevel < 1) {
             return null;
         }

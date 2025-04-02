@@ -44,7 +44,7 @@ public class WebMercatorProjection extends MapProjection {
 
     @Override
     public Point2D getRelativeScale(Location location) {
-        double k = 1d / Math.cos(location.getLatitude() * Math.PI / 180d); // p.44 (7-3)
+        double k = 1d / Math.cos(location.latitude() * Math.PI / 180d); // p.44 (7-3)
 
         return new Point2D(k, k);
     }
@@ -52,8 +52,8 @@ public class WebMercatorProjection extends MapProjection {
     @Override
     public Point2D locationToMap(Location location) {
         return new Point2D(
-                WGS84_METERS_PER_DEGREE * location.getLongitude(),
-                WGS84_METERS_PER_DEGREE * latitudeToY(location.getLatitude()));
+                WGS84_METERS_PER_DEGREE * location.longitude(),
+                WGS84_METERS_PER_DEGREE * latitudeToY(location.latitude()));
     }
 
     @Override

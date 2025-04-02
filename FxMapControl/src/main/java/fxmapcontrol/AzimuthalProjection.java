@@ -15,16 +15,14 @@ public abstract class AzimuthalProjection extends MapProjection {
 
     @Override
     public Bounds boundingBoxToBounds(MapBoundingBox boundingBox) {
-        if (!(boundingBox instanceof CenteredBoundingBox)) {
+        if (boundingBox instanceof CenteredBoundingBox cbbox) {
+            Point2D center = locationToMap(cbbox.getCenter());
+            double width = cbbox.getWidth();
+            double height = cbbox.getHeight();
+            return new BoundingBox(center.getX() - width / 2d, center.getY() - height / 2d, width, height);
+        } else {
             return super.boundingBoxToBounds(boundingBox);
         }
-
-        CenteredBoundingBox cbbox = (CenteredBoundingBox) boundingBox;
-        Point2D center = locationToMap(cbbox.getCenter());
-        double width = cbbox.getWidth();
-        double height = cbbox.getHeight();
-
-        return new BoundingBox(center.getX() - width / 2d, center.getY() - height / 2d, width, height);
     }
 
     @Override
@@ -40,10 +38,10 @@ public abstract class AzimuthalProjection extends MapProjection {
      * Calculates azimuth and distance in radians from location1 to location2.
      */
     public static double[] getAzimuthDistance(Location location1, Location location2) {
-        double lat1 = location1.getLatitude() * Math.PI / 180d;
-        double lon1 = location1.getLongitude() * Math.PI / 180d;
-        double lat2 = location2.getLatitude() * Math.PI / 180d;
-        double lon2 = location2.getLongitude() * Math.PI / 180d;
+        double lat1 = location1.latitude() * Math.PI / 180d;
+        double lon1 = location1.longitude() * Math.PI / 180d;
+        double lat2 = location2.latitude() * Math.PI / 180d;
+        double lon2 = location2.longitude() * Math.PI / 180d;
         double cosLat1 = Math.cos(lat1);
         double sinLat1 = Math.sin(lat1);
         double cosLat2 = Math.cos(lat2);
@@ -61,7 +59,7 @@ public abstract class AzimuthalProjection extends MapProjection {
      * Calculates the Location of the point given by azimuth and distance in radians from location.
      */
     public static Location getLocation(Location location, double azimuth, double distance) {
-        double lat = location.getLatitude() * Math.PI / 180d;
+        double lat = location.latitude() * Math.PI / 180d;
         double sinDistance = Math.sin(distance);
         double cosDistance = Math.cos(distance);
         double cosAzimuth = Math.cos(azimuth);
@@ -72,6 +70,6 @@ public abstract class AzimuthalProjection extends MapProjection {
         double lat2 = Math.asin(Math.max(Math.min(sinLat2, 1d), -1d));
         double dLon = Math.atan2(sinDistance * sinAzimuth, cosLat1 * cosDistance - sinLat1 * sinDistance * cosAzimuth);
 
-        return new Location(180d / Math.PI * lat2, location.getLongitude() + 180d / Math.PI * dLon);
+        return new Location(180d / Math.PI * lat2, location.longitude() + 180d / Math.PI * dLon);
     }
 }

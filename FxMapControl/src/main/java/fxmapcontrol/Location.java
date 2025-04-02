@@ -7,39 +7,10 @@ package fxmapcontrol;
 /**
  * A geographic location with latitude and longitude values in degrees.
  */
-public class Location {
-
-    private final double latitude;
-    private final double longitude;
-
-    public Location(double latitude, double longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
-
-    public final double getLatitude() {
-        return latitude;
-    }
-
-    public final double getLongitude() {
-        return longitude;
-    }
-
-    public final boolean equals(Location location) {
-        return this == location
-                || (latitude == location.latitude && longitude == location.longitude);
-    }
-
-    @Override
-    public final boolean equals(Object obj) {
-        return (obj instanceof Location) && equals((Location) obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return Double.hashCode(latitude) ^ Double.hashCode(longitude);
-    }
-
+public record Location(
+  double latitude,
+  double longitude
+) {
     public static Location valueOf(String locationString) {
         String[] pair = locationString.split(",");
         if (pair.length != 2) {
@@ -47,8 +18,8 @@ public class Location {
                     "Location string must be a comma-separated pair of double values");
         }
         return new Location(
-                Double.parseDouble(pair[0]),
-                Double.parseDouble(pair[1]));
+                Double.valueOf(pair[0]),
+                Double.valueOf(pair[1]));
     }
 
     public static double normalizeLongitude(double longitude) {
@@ -71,10 +42,10 @@ public class Location {
     }
 
     public static double greatCircleAzimuth(Location location1, Location location2) {
-        double lat1 = location1.getLatitude() * Math.PI / 180d;
-        double lon1 = location1.getLongitude() * Math.PI / 180d;
-        double lat2 = location2.getLatitude() * Math.PI / 180d;
-        double lon2 = location2.getLongitude() * Math.PI / 180d;
+        double lat1 = location1.latitude() * Math.PI / 180d;
+        double lon1 = location1.longitude() * Math.PI / 180d;
+        double lat2 = location2.latitude() * Math.PI / 180d;
+        double lon2 = location2.longitude() * Math.PI / 180d;
         double sinLat1 = Math.sin(lat1);
         double cosLat1 = Math.cos(lat1);
         double sinLat2 = Math.sin(lat2);
@@ -86,10 +57,10 @@ public class Location {
     }
 
     public static double greatCircleDistance(Location location1, Location location2) {
-        double lat1 = location1.getLatitude() * Math.PI / 180d;
-        double lon1 = location1.getLongitude() * Math.PI / 180d;
-        double lat2 = location2.getLatitude() * Math.PI / 180d;
-        double lon2 = location2.getLongitude() * Math.PI / 180d;
+        double lat1 = location1.latitude() * Math.PI / 180d;
+        double lon1 = location1.longitude() * Math.PI / 180d;
+        double lat2 = location2.latitude() * Math.PI / 180d;
+        double lon2 = location2.longitude() * Math.PI / 180d;
         double sinLat1 = Math.sin(lat1);
         double cosLat1 = Math.cos(lat1);
         double sinLat2 = Math.sin(lat2);
@@ -106,8 +77,8 @@ public class Location {
     public static Location greatCircleLocation(Location location, double azimuth, double distance) {
         double s12 = distance / MapProjection.WGS84_EQUATORIAL_RADIUS;
         double az1 = azimuth * Math.PI / 180d;
-        double lat1 = location.getLatitude() * Math.PI / 180d;
-        double lon1 = location.getLongitude() * Math.PI / 180d;
+        double lat1 = location.latitude() * Math.PI / 180d;
+        double lon1 = location.longitude() * Math.PI / 180d;
         double sinS12 = Math.sin(s12);
         double cosS12 = Math.cos(s12);
         double sinAz1 = Math.sin(az1);

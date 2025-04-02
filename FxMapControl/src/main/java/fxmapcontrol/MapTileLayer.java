@@ -5,8 +5,7 @@
 package fxmapcontrol;
 
 import java.util.ArrayList;
-import java.util.stream.Collectors;
-
+import java.util.List;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.image.ImageView;
@@ -24,7 +23,7 @@ public class MapTileLayer extends MapTileLayerBase {
     private int minZoomLevel;
     private int maxZoomLevel = 18;
     private TileMatrix tileMatrix;
-    private ArrayList<Tile> tiles = new ArrayList<>();
+    private List<Tile> tiles = new ArrayList<>();
 
     public static MapTileLayer getOpenStreetMapLayer() {
         return new MapTileLayer("OpenStreetMap", "http://tile.openstreetmap.org/{z}/{x}/{y}.png", 0, 19);
@@ -85,9 +84,9 @@ public class MapTileLayer extends MapTileLayerBase {
     protected void setTransform() {
         // tile matrix origin in pixels
         //
-        Point2D tileMatrixOrigin = new Point2D(TILE_SIZE * tileMatrix.getXMin(), TILE_SIZE * tileMatrix.getYMin());
+        Point2D tileMatrixOrigin = new Point2D(TILE_SIZE * tileMatrix.xMin(), TILE_SIZE * tileMatrix.yMin());
 
-        double tileMatrixScale = ViewTransform.zoomLevelToScale(tileMatrix.getZoomLevel());
+        double tileMatrixScale = ViewTransform.zoomLevelToScale(tileMatrix.zoomLevel());
 
         getTransforms().set(0,
                 getMap().getViewTransform().getTileLayerTransform(tileMatrixScale, MAP_TOP_LEFT, tileMatrixOrigin));
@@ -111,11 +110,11 @@ public class MapTileLayer extends MapTileLayerBase {
         int yMax = (int) Math.floor(tileBounds.getMaxY() / TILE_SIZE);
 
         if (tileMatrix != null
-                && tileMatrix.getZoomLevel() == tileMatrixZoomLevel
-                && tileMatrix.getXMin() == xMin
-                && tileMatrix.getYMin() == yMin
-                && tileMatrix.getXMax() == xMax
-                && tileMatrix.getYMax() == yMax) {
+                && tileMatrix.zoomLevel() == tileMatrixZoomLevel
+                && tileMatrix.xMin() == xMin
+                && tileMatrix.yMin() == yMin
+                && tileMatrix.xMax() == xMax
+                && tileMatrix.yMax() == yMax) {
             return false;
         }
 
@@ -129,25 +128,25 @@ public class MapTileLayer extends MapTileLayerBase {
         }
 
         MapBase map = getMap();
-        ArrayList<Tile> newTiles = new ArrayList<>();
+        List<Tile> newTiles = new ArrayList<>();
 
         if (map != null && tileMatrix != null && getTileSource() != null) {
-            int maxZoom = Math.min(tileMatrix.getZoomLevel(), maxZoomLevel);
+            int maxZoom = Math.min(tileMatrix.zoomLevel(), maxZoomLevel);
 
             if (maxZoom >= minZoomLevel) {
                 int minZoom = maxZoom;
 
                 if (this == map.getChildrenUnmodifiable().stream().findFirst().orElse(null)) {
                     // load background tiles
-                    minZoom = Math.max(tileMatrix.getZoomLevel() - getMaxBackgroundLevels(), minZoomLevel);
+                    minZoom = Math.max(tileMatrix.zoomLevel() - getMaxBackgroundLevels(), minZoomLevel);
                 }
 
                 for (int tz = minZoom; tz <= maxZoom; tz++) {
-                    int tileSize = 1 << (tileMatrix.getZoomLevel() - tz);
-                    int x1 = (int) Math.floor((double) tileMatrix.getXMin() / tileSize); // may be negative
-                    int x2 = tileMatrix.getXMax() / tileSize;
-                    int y1 = Math.max(tileMatrix.getYMin() / tileSize, 0);
-                    int y2 = Math.min(tileMatrix.getYMax() / tileSize, (1 << tz) - 1);
+                    int tileSize = 1 << (tileMatrix.zoomLevel() - tz);
+                    int x1 = (int) Math.floor((double) tileMatrix.xMin() / tileSize); // may be negative
+                    int x2 = tileMatrix.xMax() / tileSize;
+                    int y1 = Math.max(tileMatrix.yMin() / tileSize, 0);
+                    int y2 = Math.min(tileMatrix.yMax() / tileSize, (1 << tz) - 1);
 
                     for (int ty = y1; ty <= y2; ty++) {
                         for (int tx = x1; tx <= x2; tx++) {
@@ -187,14 +186,14 @@ public class MapTileLayer extends MapTileLayerBase {
             getChildren().setAll(tiles.stream()
                     .map(tile -> {
                         ImageView imageView = tile.getImageView();
-                        int tileSize = TILE_SIZE << (tileMatrix.getZoomLevel() - tile.getZoomLevel());
-                        imageView.setX(tileSize * tile.getX() - TILE_SIZE * tileMatrix.getXMin());
-                        imageView.setY(tileSize * tile.getY() - TILE_SIZE * tileMatrix.getYMin());
+                        int tileSize = TILE_SIZE << (tileMatrix.zoomLevel() - tile.getZoomLevel());
+                        imageView.setX(tileSize * tile.getX() - TILE_SIZE * tileMatrix.xMin());
+                        imageView.setY(tileSize * tile.getY() - TILE_SIZE * tileMatrix.yMin());
                         imageView.setFitWidth(tileSize);
                         imageView.setFitHeight(tileSize);
                         return imageView;
                     })
-                    .collect(Collectors.toList()));
+                    .toList());
         }
 
         getTileImageLoader().loadTiles(tiles, getTileSource(), getName());

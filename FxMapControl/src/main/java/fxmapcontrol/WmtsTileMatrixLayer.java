@@ -6,8 +6,6 @@ package fxmapcontrol;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Parent;
@@ -38,28 +36,28 @@ public class WmtsTileMatrixLayer extends Parent {
     public final void setTransform(ViewTransform viewTransform) {
         // tile matrix origin in pixels
         //
-        Point2D tileMatrixOrigin = new Point2D(tileMatrix.getTileWidth() * xMin, tileMatrix.getTileHeight() * yMin);
+        Point2D tileMatrixOrigin = new Point2D(tileMatrix.tileWidth() * xMin, tileMatrix.tileHeight() * yMin);
 
         getTransforms().set(0,
-                viewTransform.getTileLayerTransform(tileMatrix.getScale(), tileMatrix.getTopLeft(), tileMatrixOrigin));
+                viewTransform.getTileLayerTransform(tileMatrix.scale(), tileMatrix.topLeft(), tileMatrixOrigin));
     }
 
     public final boolean setBounds(ViewTransform viewTransform, double viewWidth, double viewHeight) {
         // bounds in tile pixels from view size
         //
-        Bounds bounds = viewTransform.getTileMatrixBounds(tileMatrix.getScale(), tileMatrix.getTopLeft(), viewWidth, viewHeight);
+        Bounds bounds = viewTransform.getTileMatrixBounds(tileMatrix.scale(), tileMatrix.topLeft(), viewWidth, viewHeight);
 
         // tile column and row index bounds
         //
-        int minX = (int) Math.floor(bounds.getMinX() / tileMatrix.getTileWidth());
-        int minY = (int) Math.floor(bounds.getMinY() / tileMatrix.getTileHeight());
-        int maxX = (int) Math.floor(bounds.getMaxX() / tileMatrix.getTileWidth());
-        int maxY = (int) Math.floor(bounds.getMaxY() / tileMatrix.getTileHeight());
+        int minX = (int) Math.floor(bounds.getMinX() / tileMatrix.tileWidth());
+        int minY = (int) Math.floor(bounds.getMinY() / tileMatrix.tileHeight());
+        int maxX = (int) Math.floor(bounds.getMaxX() / tileMatrix.tileWidth());
+        int maxY = (int) Math.floor(bounds.getMaxY() / tileMatrix.tileHeight());
 
         minX = Math.max(minX, 0);
         minY = Math.max(minY, 0);
-        maxX = Math.min(Math.max(maxX, 0), tileMatrix.getMatrixWidth() - 1);
-        maxY = Math.min(Math.max(maxY, 0), tileMatrix.getMatrixHeight() - 1);
+        maxX = Math.min(Math.max(maxX, 0), tileMatrix.matrixWidth() - 1);
+        maxY = Math.min(Math.max(maxY, 0), tileMatrix.matrixHeight() - 1);
 
         if (xMin == minX && yMin == minY && xMax == maxX && yMax == maxY) {
             return false;
@@ -94,13 +92,13 @@ public class WmtsTileMatrixLayer extends Parent {
             getChildren().setAll(tiles.stream()
                     .map(tile -> {
                         ImageView imageView = tile.getImageView();
-                        imageView.setX(tileMatrix.getTileWidth() * (tile.getX() - xMin));
-                        imageView.setY(tileMatrix.getTileHeight() * (tile.getY() - yMin));
-                        imageView.setFitWidth(tileMatrix.getTileWidth());
-                        imageView.setFitHeight(tileMatrix.getTileHeight());
+                        imageView.setX(tileMatrix.tileWidth() * (tile.getX() - xMin));
+                        imageView.setY(tileMatrix.tileHeight() * (tile.getY() - yMin));
+                        imageView.setFitWidth(tileMatrix.tileWidth());
+                        imageView.setFitHeight(tileMatrix.tileHeight());
                         return imageView;
                     })
-                    .collect(Collectors.toList()));
+                    .toList());
         }
 
         return tiles;

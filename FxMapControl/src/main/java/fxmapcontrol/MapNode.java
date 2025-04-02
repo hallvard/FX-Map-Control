@@ -63,8 +63,8 @@ public class MapNode extends MapLayer {
                     || viewportPosition.getY() < 0d || viewportPosition.getY() > map.getHeight()) {
 
                 viewportPosition = map.locationToView(new Location(
-                        location.getLatitude(),
-                        Location.nearestLongitude(location.getLongitude(), map.getCenter().getLongitude())));
+                        location.latitude(),
+                        Location.nearestLongitude(location.longitude(), map.getCenter().longitude())));
             }
         }
 

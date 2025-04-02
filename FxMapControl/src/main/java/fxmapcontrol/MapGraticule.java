@@ -6,7 +6,6 @@ package fxmapcontrol;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
@@ -171,7 +170,7 @@ public class MapGraticule extends Parent implements IMapNode {
             double lineDistance = getLineDistance();
             double latLabelStart = Math.ceil(mapBounds.getSouth() / lineDistance) * lineDistance;
             double lonLabelStart = Math.ceil(mapBounds.getWest() / lineDistance) * lineDistance;
-            ArrayList<PathElement> pathElements = new ArrayList<>();
+            List<PathElement> pathElements = new ArrayList<>();
 
             for (double lat = latLabelStart; lat <= mapBounds.getNorth(); lat += lineDistance) {
                 Point2D lineStart = map.locationToView(new Location(lat, mapBounds.getWest()));

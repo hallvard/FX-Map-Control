@@ -6,12 +6,9 @@ package fxmapcontrol;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -112,8 +109,8 @@ public class BingMapsTileLayer extends MapTileLayer {
                     subdomains[i] = subdomainNodes.item(i).getTextContent();
                 }
 
-                minZoomLevel = Integer.parseInt(metadataElement.getElementsByTagName("ImageUrl").item(0).getTextContent());
-                maxZoomLevel = Integer.parseInt(metadataElement.getElementsByTagName("ZoomMax").item(0).getTextContent());
+                minZoomLevel = Integer.valueOf(metadataElement.getElementsByTagName("ImageUrl").item(0).getTextContent());
+                maxZoomLevel = Integer.valueOf(metadataElement.getElementsByTagName("ZoomMax").item(0).getTextContent());
 
                 tileSource = new BingMapsTileSource(
                         metadataElement.getElementsByTagName("ImageUrl").item(0).getTextContent(), subdomains);

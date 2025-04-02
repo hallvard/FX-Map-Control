@@ -7,8 +7,6 @@ package fxmapcontrol;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyProperty;
@@ -202,7 +200,7 @@ public class MapItemsControl<T> extends Parent implements IMapNode {
         List<Integer> zIndexes = getChildren().stream()
                 .filter(i -> i != mapItem)
                 .map(i -> ((MapItem<T>) i).getZIndex())
-                .collect(Collectors.toList());
+                .toList();
 
         int index = Collections.binarySearch(zIndexes, mapItem.getZIndex(), (value1, value2) -> value1 - value2);
 

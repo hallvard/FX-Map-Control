@@ -10,9 +10,9 @@ import fxmapcontrol.MapGraticule;
 import fxmapcontrol.MapNode;
 import fxmapcontrol.MapPolygon;
 import fxmapcontrol.MapProjection;
-import fxmapcontrol.StereographicProjection;
 import fxmapcontrol.MapTileLayer;
 import fxmapcontrol.OrthographicProjection;
+import fxmapcontrol.StereographicProjection;
 import fxmapcontrol.TileImageLoader;
 import fxmapcontrol.WebMercatorProjection;
 import fxmapcontrol.WmsImageLayer;
@@ -20,9 +20,8 @@ import fxmapcontrol.WmtsTileLayer;
 import fxmapcontrol.WorldMercatorProjection;
 //import fxmapprojections.GeoToolsProjection;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
-
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -51,9 +50,9 @@ public class FXMLController implements Initializable {
     @FXML
     private CheckBox seamarksCheckBox;
     @FXML
-    private ComboBox mapLayerComboBox;
+    private ComboBox<String> mapLayerComboBox;
     @FXML
-    private ComboBox projectionComboBox;
+    private ComboBox<?> projectionComboBox;
 
     @FXML
     private void handlePressed(MouseEvent event) {
@@ -130,20 +129,21 @@ public class FXMLController implements Initializable {
         map.targetZoomLevelProperty().bindBidirectional(zoomSlider.valueProperty());
         map.targetHeadingProperty().bindBidirectional(headingSlider.valueProperty());
 
-        HashMap<String, Node> mapLayers = new HashMap<>();
-        mapLayers.put("OpenStreetMap", MapTileLayer.getOpenStreetMapLayer());
-        mapLayers.put("OpenStreetMap DE", new MapTileLayer("OpenStreetMap German", "https://tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png"));
-        mapLayers.put("Seamarks", new MapTileLayer("Seamarks", "http://tiles.openseamap.org/seamark/{z}/{x}/{y}.png", 9, 18));
-        mapLayers.put("Stamen Terrain", new MapTileLayer("Stamen Terrain", "http://tile.stamen.com/terrain/{z}/{x}/{y}.png"));
-        mapLayers.put("OpenStreetMap WMS", new WmsImageLayer("http://ows.terrestris.de/osm/service"));
-        mapLayers.put("ChartServer WMS", new ChartServerLayer("https://wms.sevencs.com:9090"));
-        mapLayers.put("TopPlusOpen WMS", new WmsImageLayer("https://sgx.geodatenzentrum.de/wms_topplus_open"));
-        mapLayers.put("TopPlusOpen WMTS", new WmtsTileLayer("TopPlusOpen", "https://sgx.geodatenzentrum.de/wmts_topplus_open/1.0.0/WMTSCapabilities.xml"));
+        Map<String, Node> mapLayers = Map.of(
+          "OpenStreetMap", MapTileLayer.getOpenStreetMapLayer(),
+          "OpenStreetMap DE", new MapTileLayer("OpenStreetMap German", "https://tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png"),
+          "Seamarks", new MapTileLayer("Seamarks", "http://tiles.openseamap.org/seamark/{z}/{x}/{y}.png", 9, 18),
+          "Stamen Terrain", new MapTileLayer("Stamen Terrain", "http://tile.stamen.com/terrain/{z}/{x}/{y}.png"),
+          "OpenStreetMap WMS", new WmsImageLayer("http://ows.terrestris.de/osm/service"),
+          "ChartServer WMS", new ChartServerLayer("https://wms.sevencs.com:9090"),
+          "TopPlusOpen WMS", new WmsImageLayer("https://sgx.geodatenzentrum.de/wms_topplus_open"),
+          "TopPlusOpen WMTS", new WmtsTileLayer("TopPlusOpen", "https://sgx.geodatenzentrum.de/wmts_topplus_open/1.0.0/WMTSCapabilities.xml")
+        );
         //mapLayers.put("Bing Maps Aerial", new BingMapsTileLayer(BingMapsTileLayer.MapMode.Aerial));
 
         mapLayerComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                Node mapLayer = mapLayers.get((String) newValue);
+                Node mapLayer = mapLayers.get(newValue);
 
                 if (mapLayers.containsValue(map.getChildren().get(0))) {
                     map.getChildren().set(0, mapLayer);
@@ -151,16 +151,14 @@ public class FXMLController implements Initializable {
                     map.getChildren().add(0, mapLayer);
                 }
 
-                if (mapLayer instanceof BingMapsTileLayer
-                        && ((BingMapsTileLayer) mapLayer).getMapMode() != BingMapsTileLayer.MapMode.Road) {
-                    map.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
-                    mapGraticule.setStroke(Color.WHITE);
-                    mapGraticule.setTextFill(Color.WHITE);
-                } else {
-                    map.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-                    mapGraticule.setStroke(Color.BLACK);
-                    mapGraticule.setTextFill(Color.BLACK);
+                Color strokeColor = Color.BLACK, textColor = Color.BLACK, backgroundColoer = Color.WHITE;
+                if (mapLayer instanceof BingMapsTileLayer bmtl && bmtl.getMapMode() != BingMapsTileLayer.MapMode.Road) {
+                    backgroundColoer = Color.BLACK;
+                    textColor = strokeColor = Color.WHITE;
                 }
+                map.setBackground(new Background(new BackgroundFill(backgroundColoer, CornerRadii.EMPTY, Insets.EMPTY)));
+                mapGraticule.setStroke(strokeColor);
+                mapGraticule.setTextFill(textColor);
             }
         });
         mapLayerComboBox.getSelectionModel().select(0);

@@ -66,8 +66,7 @@ public class GeoToolsProjection extends MapProjection {
                     .map(id -> id.toString())
                     .findFirst().orElse("");
 
-            if (crs instanceof ProjectedCRS) {
-                ProjectedCRS projCrs = (ProjectedCRS) crs;
+            if (crs instanceof ProjectedCRS projCrs) {
                 Projection proj = projCrs.getConversionFromBase();
                 ParameterValueGroup parameters = proj.getParameterValues();
 
